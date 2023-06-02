@@ -1,34 +1,49 @@
-//Voce deve rodar os testes usando:  npm test
-//Para testar a aplicação, rode: npm run dev
+//imports necessários para configuração do servidor
+const createServer = require("node:http").createServer;
+const gracefulShutdown = require("http-graceful-shutdown");
+const env = require("./config/environment");
+const dataSource = require("./config/orm");
 
-//mais infos
-//https://github.com/ZijianHe/koa-router
+//importando o Koa
+const Koa = require("koa");
 
-// todas as configuraçoes devem ser passadas via environment variables
-const PORT = process.env.PORT || 3000;
+//importando as rotas
+const router = require("./controllers/userController");
 
-const Koa = require('koa');
-const Router = require('koa-router');
+//instanciando o Koa
+const app = new Koa();
 
-const koa = new Koa();
-var router = new Router();
+//criando um servidor
+const server = createServer(app.callback());
 
-//rota simples pra testar se o servidor está online
-router.get('/', async (ctx) => {
-  ctx.body = `Seu servidor esta rodando em http://localhost:${PORT}`; //http://localhost:3000/
-});
+//inicializando o servidor
+void (async (server) => {
+  try {
+    await dataSource.initialize();
 
-//Uma rota de exemplo simples aqui.
-//As rotas devem ficar em arquivos separados, /src/controllers/userController.js por exemplo
-router.get('/users', async (ctx) => {
-    ctx.status = 200;
-    ctx.body = {total:0, count: 0, rows:[]}
-});
+    server.listen(env.PORT, () => {
+      console.info(`Listening at http://localhost:${env.PORT || 3000}`);
+      console.log("Press Ctrl-C to shutdown");
+    });
 
-koa
-  .use(router.routes())
-  .use(router.allowedMethods());
+    gracefulShutdown(server, {
+      development: env.isDevelopment,
+      onShutdown: async () => {
+        await dataSource.destroy();
+      },
+      finally: () => {
+        console.info("Server graceful shut down completed.");
+      },
+    });
+  } catch (error) {
+    console.error("Unable to run the server because of the following error:");
+    console.error(error);
+    process.exitCode = 1;
+  }
+})(server);
 
-const server = koa.listen(PORT);
+//indicando os metodos e rotas utilizados pela aplicação
+app.use(router.routes()).use(router.allowedMethods());
 
+// exportando servidor
 module.exports = server;
