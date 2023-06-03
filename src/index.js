@@ -4,6 +4,8 @@ const gracefulShutdown = require("http-graceful-shutdown");
 const env = require("./config/environment");
 const dataSource = require("./config/orm");
 
+const bodyParser = require("koa-bodyparser");
+
 //importando o Koa
 const Koa = require("koa");
 
@@ -44,6 +46,8 @@ void (async (server) => {
 
 //indicando os metodos e rotas utilizados pela aplicação
 app.use(router.routes()).use(router.allowedMethods());
+
+app.use(bodyParser());
 
 // exportando servidor
 module.exports = server;
