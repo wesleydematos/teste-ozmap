@@ -11,27 +11,84 @@ router
     ctx.body = "Olá mundo!";
   })
   .post("/user", koaBody(), async (ctx) => {
+    const { age, name } = ctx.request.body;
+
+    if (age < 18) {
+      ctx.body = { messagem: "O usuário deve ter a idade maior que 18." };
+      ctx.status = StatusCodes.BAD_REQUEST;
+
+      return;
+    }
+
     const userRepository = dataSource.getRepository(User);
-    //verificar se é maior de idade
-    //verificar se email já foi cadastrado
+
+    const nameExists = await userRepository.findOneBy({ name: name });
+
+    if (nameExists) {
+      ctx.body = {
+        messagem: "Nome já cadastrado, o campo deve ser único.",
+      };
+      ctx.status = StatusCodes.BAD_REQUEST;
+
+      return;
+    }
+
     const user = userRepository.create({
       ...ctx.request.body,
     });
 
     await userRepository.save(user);
 
+    ctx.body = user;
     ctx.status = StatusCodes.CREATED;
   })
   .get("/users", async (ctx) => {
-    const userRepository = dataSource.getRepository(User);
-    const users = await userRepository.findAndCount();
+    const page = Number(ctx.request.query.page) || 1;
+    const pageSize = 5;
 
-    ctx.status = 200;
-    ctx.body = { users: users[0], rows: users[1] };
-  })
-  .delete("/user/:id", async (ctx) => {
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = page * pageSize;
+
     const userRepository = dataSource.getRepository(User);
-    const user = await userRepository.findOneBy({ id: ctx.params.id });
+    const allUsers = await userRepository.findAndCount();
+
+    let totalPage = allUsers[1] / pageSize;
+    totalPage = Math.ceil(totalPage);
+
+    const nextPage =
+      page + 1 > totalPage
+        ? null
+        : `http://localhost:3000/users/?page=${page + 1}`;
+
+    const paginatedUsers = allUsers[0].slice(startIndex, endIndex);
+
+    ctx.status = StatusCodes.OK;
+    ctx.body = {
+      total: allUsers[1],
+      count: page * pageSize > allUsers[1] ? allUsers[1] : page * pageSize,
+      nextPage: nextPage,
+      rows: paginatedUsers,
+    };
+  })
+  .get("/user/:name", async (ctx) => {
+    const name = ctx.params.name;
+
+    const userRepository = dataSource.getRepository(User);
+    const user = await userRepository.findOneBy({ name: name });
+
+    if (!user) {
+      ctx.status = StatusCodes.NOT_FOUND;
+      ctx.body = { mensagem: "Usuário não encontrado." };
+
+      return;
+    }
+
+    ctx.body = user;
+    ctx.status = StatusCodes.OK;
+  })
+  .delete("/user/:name", async (ctx) => {
+    const userRepository = dataSource.getRepository(User);
+    const user = await userRepository.findOneBy({ name: ctx.params.name });
 
     if (!user) {
       ctx.status = StatusCodes.NOT_FOUND;
