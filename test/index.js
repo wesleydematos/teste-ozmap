@@ -84,16 +84,109 @@ describe("Testes da aplicaçao", () => {
         done();
       });
   });
-  //...adicionar pelo menos mais 5 usuarios. se adicionar usuario menor de age, deve dar erro. Ps: não criar o usuario naoExiste
+
+  //Criando 5 usuários para popular o db
+  it("deveria criar o usuario 1", function (done) {
+    chai
+      .request(app)
+      .post("/user")
+      .send({ name: "usuario1", email: "usuario1@mail.com", age: 35 })
+      .end(function (err, res) {
+        expect(err).to.be.null;
+        expect(res).to.have.status(201);
+        done();
+      });
+  });
+
+  it("deveria criar o usuario 2", function (done) {
+    chai
+      .request(app)
+      .post("/user")
+      .send({ name: "usuario2", email: "usuario2@mail.com", age: 35 })
+      .end(function (err, res) {
+        expect(err).to.be.null;
+        expect(res).to.have.status(201);
+        done();
+      });
+  });
+
+  it("deveria criar o usuario 3", function (done) {
+    chai
+      .request(app)
+      .post("/user")
+      .send({ name: "usuario3", email: "usuario3@mail.com", age: 35 })
+      .end(function (err, res) {
+        expect(err).to.be.null;
+        expect(res).to.have.status(201);
+        done();
+      });
+  });
+
+  it("deveria criar o usuario 4", function (done) {
+    chai
+      .request(app)
+      .post("/user")
+      .send({ name: "usuario4", email: "usuario4@mail.com", age: 35 })
+      .end(function (err, res) {
+        expect(err).to.be.null;
+        expect(res).to.have.status(201);
+        done();
+      });
+  });
+
+  it("deveria criar o usuario 5", function (done) {
+    chai
+      .request(app)
+      .post("/user")
+      .send({ name: "usuario5", email: "usuario5@mail.com", age: 35 })
+      .end(function (err, res) {
+        expect(err).to.be.null;
+        expect(res).to.have.status(201);
+        done();
+      });
+  });
+  //
+
+  it("não deveria ser possivel criar o usuario com idade menor que 18", function (done) {
+    chai
+      .request(app)
+      .post("/user")
+      .send({ name: "menordeidade", email: "menordeidade@mail.com", age: 17 })
+      .end(function (err, res) {
+        expect(err).to.be.null;
+        expect(res).to.have.status(400);
+        expect(res.body).to.be.jsonSchema({
+          mensagem: "O usuário deve ter a idade maior que 18.",
+        });
+        done();
+      });
+  });
+
+  it("não deveria ser possivel criar o usuario com nome repetido.", function (done) {
+    chai
+      .request(app)
+      .post("/user")
+      .send({ name: "raupp", email: "jose.raupp@devoz.com.br", age: 35 })
+      .end(function (err, res) {
+        expect(err).to.be.null;
+        expect(res).to.have.status(400);
+        expect(res.body).to.be.jsonSchema({
+          mensagem: "Nome já cadastrado, o campo deve ser único.",
+        });
+        done();
+      });
+  });
 
   it("o usuario naoExiste não existe no sistema", function (done) {
     chai
       .request(app)
       .get("/user/naoExiste")
       .end(function (err, res) {
-        expect(err.response.body.error).to.be.equal("User not found"); //possivelmente forma errada de verificar a mensagem de erro
+        expect(err).to.be.null;
+        expect(res.body).to.be.jsonSchema({
+          mensagem: "Usuário não encontrado.",
+        });
         expect(res).to.have.status(404);
-        expect(res.body).to.be.jsonSchema(userSchema);
         done();
       });
   });
@@ -116,8 +209,8 @@ describe("Testes da aplicaçao", () => {
       .delete("/user/raupp")
       .end(function (err, res) {
         expect(err).to.be.null;
-        expect(res).to.have.status(200);
-        expect(res.body).to.be.jsonSchema(userSchema);
+        expect(res).to.have.status(204);
+        expect(res.body).to.be.jsonSchema({});
         done();
       });
   });
@@ -128,8 +221,10 @@ describe("Testes da aplicaçao", () => {
       .get("/user/raupp")
       .end(function (err, res) {
         expect(err).to.be.null;
-        expect(res).to.have.status(200);
-        expect(res.body).to.be.jsonSchema(userSchema);
+        expect(res).to.have.status(404);
+        expect(res.body).to.be.jsonSchema({
+          mensagem: "Usuário não encontrado.",
+        });
         done();
       });
   });
