@@ -46,6 +46,8 @@ paths:
           description: age - email and name are mandatory fields.
         "400 - age":
           description: User must be over 18 years old.
+        "409":
+          description: User already exists.
   /users/?page={pageNumber}:
     get:
       tags:
