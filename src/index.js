@@ -1,34 +1,40 @@
-//Voce deve rodar os testes usando:  npm test
-//Para testar a aplicação, rode: npm run dev
+const createServer = require("node:http").createServer;
+const gracefulShutdown = require("http-graceful-shutdown");
+const Koa = require("koa");
 
-//mais infos
-//https://github.com/ZijianHe/koa-router
+const env = require("./config/environment");
+const dataSource = require("./config/orm");
+const router = require("./controllers/userController");
 
-// todas as configuraçoes devem ser passadas via environment variables
-const PORT = process.env.PORT || 3000;
+const app = new Koa();
 
-const Koa = require('koa');
-const Router = require('koa-router');
+const server = createServer(app.callback());
 
-const koa = new Koa();
-var router = new Router();
+void (async (server) => {
+  try {
+    await dataSource.initialize();
 
-//rota simples pra testar se o servidor está online
-router.get('/', async (ctx) => {
-  ctx.body = `Seu servidor esta rodando em http://localhost:${PORT}`; //http://localhost:3000/
-});
+    server.listen(env.PORT, () => {
+      console.info(`Listening at http://localhost:${env.PORT || 3000}`);
+      console.log("Press Ctrl-C to shutdown");
+    });
 
-//Uma rota de exemplo simples aqui.
-//As rotas devem ficar em arquivos separados, /src/controllers/userController.js por exemplo
-router.get('/users', async (ctx) => {
-    ctx.status = 200;
-    ctx.body = {total:0, count: 0, rows:[]}
-});
+    gracefulShutdown(server, {
+      development: env.isDevelopment,
+      onShutdown: async () => {
+        await dataSource.destroy();
+      },
+      finally: () => {
+        console.info("Server graceful shut down completed.");
+      },
+    });
+  } catch (error) {
+    console.error("Unable to run the server because of the following error:");
+    console.error(error);
+    process.exitCode = 1;
+  }
+})(server);
 
-koa
-  .use(router.routes())
-  .use(router.allowedMethods());
-
-const server = koa.listen(PORT);
+app.use(router.routes()).use(router.allowedMethods());
 
 module.exports = server;
