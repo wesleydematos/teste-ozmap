@@ -1,8 +1,9 @@
 const Router = require("koa-router");
-const dataSource = require("../config/orm");
-const User = require("../entities/user");
 const StatusCodes = require("http-status-codes").StatusCodes;
 const { koaBody } = require("koa-body");
+
+const dataSource = require("../config/orm");
+const User = require("../entities/user");
 
 var router = new Router();
 
@@ -11,7 +12,14 @@ router
     ctx.body = "Olá mundo!";
   })
   .post("/user", koaBody(), async (ctx) => {
-    const { age, name } = ctx.request.body;
+    const { age, name, email } = ctx.request.body;
+
+    if (!age || !name || !email) {
+      ctx.throw(
+        StatusCodes.BAD_REQUEST,
+        "'age', 'email' e 'name' são campos obrigatórios."
+      );
+    }
 
     if (age < 18) {
       ctx.throw(
@@ -21,7 +29,6 @@ router
     }
 
     const userRepository = dataSource.getRepository(User);
-
     const nameExists = await userRepository.findOneBy({ name: name });
 
     if (nameExists) {
@@ -32,7 +39,9 @@ router
     }
 
     const user = userRepository.create({
-      ...ctx.request.body,
+      name: name,
+      age: age,
+      email: email,
     });
 
     await userRepository.save(user);
