@@ -14,10 +14,10 @@ router
     const { age, name } = ctx.request.body;
 
     if (age < 18) {
-      ctx.body = { messagem: "O usuário deve ter a idade maior que 18." };
-      ctx.status = StatusCodes.BAD_REQUEST;
-
-      return;
+      ctx.throw(
+        StatusCodes.BAD_REQUEST,
+        "O usuário deve ter a idade maior que 18."
+      );
     }
 
     const userRepository = dataSource.getRepository(User);
@@ -25,12 +25,10 @@ router
     const nameExists = await userRepository.findOneBy({ name: name });
 
     if (nameExists) {
-      ctx.body = {
-        messagem: "Nome já cadastrado, o campo deve ser único.",
-      };
-      ctx.status = StatusCodes.BAD_REQUEST;
-
-      return;
+      ctx.throw(
+        StatusCodes.BAD_REQUEST,
+        "Nome já cadastrado, o campo deve ser único."
+      );
     }
 
     const user = userRepository.create({
@@ -77,10 +75,7 @@ router
     const user = await userRepository.findOneBy({ name: name });
 
     if (!user) {
-      ctx.status = StatusCodes.NOT_FOUND;
-      ctx.body = { mensagem: "Usuário não encontrado." };
-
-      return;
+      ctx.throw(StatusCodes.NOT_FOUND, "Usuário não encontrado.");
     }
 
     ctx.body = user;
@@ -91,16 +86,39 @@ router
     const user = await userRepository.findOneBy({ name: ctx.params.name });
 
     if (!user) {
-      ctx.status = StatusCodes.NOT_FOUND;
-      ctx.body = { mensagem: "Usuário não encontrado." };
-
-      return;
+      ctx.throw(StatusCodes.NOT_FOUND, "Usuário não encontrado.");
     }
 
     await userRepository.remove(user);
 
     ctx.status = StatusCodes.NO_CONTENT;
     ctx.body = null;
+  })
+  .patch("/user/:name", koaBody(), async (ctx) => {
+    const userRepository = dataSource.getRepository(User);
+    const user = await userRepository
+      .findOneByOrFail({ name: ctx.params.name })
+      .catch(() => {
+        ctx.throw(StatusCodes.NOT_FOUND, "Usuário não encontrado.");
+      });
+
+    if (ctx.request.body.name) {
+      const nameExists = await userRepository.findOneBy({
+        name: ctx.request.body.name,
+      });
+
+      if (nameExists) {
+        ctx.throw(
+          StatusCodes.BAD_REQUEST,
+          "Nome já cadastrado, o campo deve ser único."
+        );
+      }
+    }
+
+    userRepository.merge(user, ctx.request.body);
+    await userRepository.save(user);
+
+    ctx.body = user;
   });
 
 module.exports = router;
