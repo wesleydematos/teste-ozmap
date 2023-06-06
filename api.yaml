@@ -1,0 +1,231 @@
+openapi: 3.0.3
+info:
+  title: API CRUD User
+  description: |-
+    API que possibilita adicionar, editar, listar e remover usuários.
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: wesleydematos3@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: http://localhost:3000/swagger/
+tags:
+  - name: user
+    description: Operations about user
+paths:
+  /user:
+    post:
+      tags:
+        - user
+      summary: Create user
+      description: In this route it is possible to create a user.
+      operationId: createUser
+      requestBody:
+        description: Created user object
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "201":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "400 - fields":
+          description: age - email and name are mandatory fields.
+        "400 - age":
+          description: User must be over 18 years old.
+        "409":
+          description: User already exists.
+  /users/?page={pageNumber}:
+    get:
+      tags:
+        - users
+      summary: Get users
+      description: In this route it is possible to retrieve users with pagination.
+      operationId: getUsers
+      parameters:
+        schema:
+          type: string
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UsersResponse"
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/UsersResponse"
+  /user/{user}:
+    get:
+      tags:
+        - user
+      summary: Get user by user name
+      description: In this route it is possible to retrieve a specific a user
+      operationId: getUserByName
+      parameters:
+        - name: name
+          in: path
+          description: "The name that needs to be fetched. Use Wesley for testing. "
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: User not found.
+    patch:
+      tags:
+        - user
+      summary: Update user
+      description: In this route it is possible to update a specific a user
+      operationId: updateUser
+      parameters:
+        - name: name
+          in: path
+          description: name that need to be updated. Use Wesley for testing.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Update an existent user in the store. All fields are optional.
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+          application/xml:
+            schema:
+              $ref: "#/components/schemas/User"
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "400 - unique name":
+          description: Name already registered, the field must be unique.
+        "400 - age":
+          description: User must be over 18 years old.
+        "404":
+          description: User not found.
+    delete:
+      tags:
+        - user
+      summary: Delete user
+      description: In this route it is possible to delete a specific a user.
+      operationId: deleteUser
+      parameters:
+        - name: name
+          in: path
+          description: The name that needs to be deleted. Use Wesley for testing.
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: successful operation
+        "404":
+          description: User not found
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Wesley
+        email:
+          type: string
+          example: wesley@email.com
+        age:
+          type: number
+          example: 22
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+        name:
+          type: string
+          example: Wesley
+        email:
+          type: string
+          example: wesley@email.com
+        age:
+          type: number
+          example: 22
+    UsersResponse:
+      type: object
+      properties:
+        total:
+          type: number
+          example: 10
+        count:
+          type: number
+          example: 5
+        nextPage:
+          type: string
+          example: http://localhost:3000/users/?page=2
+        rows:
+          type: array
+          example:
+            [
+              {
+                "id": 1,
+                "name": "usuario1",
+                "email": "usuario1@mail.com",
+                "age": 35,
+              },
+              {
+                "id": 2,
+                "name": "usuario2",
+                "email": "usuario2@mail.com",
+                "age": 25,
+              },
+              {
+                "id": 3,
+                "name": "usuario3",
+                "email": "usuario3@mail.com",
+                "age": 48,
+              },
+              {
+                "id": 4,
+                "name": "usuario4",
+                "email": "usuario4@mail.com",
+                "age": 18,
+              },
+              {
+                "id": 5,
+                "name": "usuario5",
+                "email": "usuario5@mail.com",
+                "age": 64,
+              },
+            ]
