@@ -1,24 +1,15 @@
-//imports necessários para configuração do servidor
 const createServer = require("node:http").createServer;
 const gracefulShutdown = require("http-graceful-shutdown");
-const env = require("./config/environment");
-const dataSource = require("./config/orm");
-
-const bodyParser = require("koa-bodyparser");
-
-//importando o Koa
 const Koa = require("koa");
 
-//importando as rotas
+const env = require("./config/environment");
+const dataSource = require("./config/orm");
 const router = require("./controllers/userController");
 
-//instanciando o Koa
 const app = new Koa();
 
-//criando um servidor
 const server = createServer(app.callback());
 
-//inicializando o servidor
 void (async (server) => {
   try {
     await dataSource.initialize();
@@ -44,10 +35,6 @@ void (async (server) => {
   }
 })(server);
 
-//indicando os metodos e rotas utilizados pela aplicação
 app.use(router.routes()).use(router.allowedMethods());
 
-app.use(bodyParser());
-
-// exportando servidor
 module.exports = server;
