@@ -1,14 +1,16 @@
 const createServer = require("node:http").createServer;
 const gracefulShutdown = require("http-graceful-shutdown");
 const Koa = require("koa");
+const yamljs = require("yamljs");
+const { koaSwagger } = require("koa2-swagger-ui");
 
 const env = require("./config/environment");
 const dataSource = require("./config/orm");
 const router = require("./controllers/userController");
 
 const app = new Koa();
-
 const server = createServer(app.callback());
+const spec = yamljs.load("api.yaml");
 
 void (async (server) => {
   try {
@@ -36,5 +38,14 @@ void (async (server) => {
 })(server);
 
 app.use(router.routes()).use(router.allowedMethods());
+app.use(
+  koaSwagger({
+    routePrefix: "/swagger",
+    swaggerOptions: {
+      url: "http://localhost:3000/swagger/",
+      spec: spec,
+    },
+  })
+);
 
 module.exports = server;
