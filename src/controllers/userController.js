@@ -104,6 +104,8 @@ router
     ctx.body = null;
   })
   .patch("/user/:name", koaBody(), async (ctx) => {
+    const { age, name } = ctx.request.body;
+
     const userRepository = dataSource.getRepository(User);
     const user = await userRepository
       .findOneByOrFail({ name: ctx.params.name })
@@ -111,7 +113,7 @@ router
         ctx.throw(StatusCodes.NOT_FOUND, "Usuário não encontrado.");
       });
 
-    if (ctx.request.body.name) {
+    if (name) {
       const nameExists = await userRepository.findOneBy({
         name: ctx.request.body.name,
       });
@@ -122,6 +124,13 @@ router
           "Nome já cadastrado, o campo deve ser único."
         );
       }
+    }
+
+    if (age < 18) {
+      ctx.throw(
+        StatusCodes.BAD_REQUEST,
+        "O usuário deve ter a idade maior que 18."
+      );
     }
 
     userRepository.merge(user, ctx.request.body);
