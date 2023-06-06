@@ -169,7 +169,7 @@ describe("Testes da aplicaçao", () => {
       .send({ name: "raupp", email: "jose.raupp@devoz.com.br", age: 35 })
       .end(function (err, res) {
         expect(err).to.be.null;
-        expect(res).to.have.status(400);
+        expect(res).to.have.status(409);
         expect(res.body).to.be.jsonSchema({
           mensagem: "Nome já cadastrado, o campo deve ser único.",
         });

@@ -33,7 +33,7 @@ router
 
     if (nameExists) {
       ctx.throw(
-        StatusCodes.BAD_REQUEST,
+        StatusCodes.CONFLICT,
         "Nome já cadastrado, o campo deve ser único."
       );
     }
@@ -120,7 +120,7 @@ router
 
       if (nameExists) {
         ctx.throw(
-          StatusCodes.BAD_REQUEST,
+          StatusCodes.CONFLICT,
           "Nome já cadastrado, o campo deve ser único."
         );
       }
