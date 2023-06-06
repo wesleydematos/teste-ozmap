@@ -68,6 +68,8 @@ Executar aplicação em ambiente de desenvolvimento:
 npm run dev
 ```
 
+- Após executar a aplicação em desenvolvimento é possível acessar a documentação da API com o Swagger-UI na rota: http://localhost:3000/swagger
+
 Executar aplicação em ambiente de testes:
 
 ```
@@ -103,6 +105,7 @@ O banco de dados será iniciado em um arquivo chamado database.sqlite após util
 | GET    | /user/:name               | Lista um usuário usando seu nome como parâmetro                            |
 | PATCH  | /user/:name               | Editar as informações do usuário usando seu nome como parâmetro            |
 | DELETE | /user/:name               | Deletar usuário usando seu nome como parâmetro                             |
+| GET    | /swagger                  | Documentação da API com Swagger-UI                                         |
 
 ---
 
