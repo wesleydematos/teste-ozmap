@@ -90,19 +90,6 @@ router
     ctx.body = user;
     ctx.status = StatusCodes.OK;
   })
-  .delete("/user/:name", async (ctx) => {
-    const userRepository = dataSource.getRepository(User);
-    const user = await userRepository.findOneBy({ name: ctx.params.name });
-
-    if (!user) {
-      ctx.throw(StatusCodes.NOT_FOUND, "Usuário não encontrado.");
-    }
-
-    await userRepository.remove(user);
-
-    ctx.status = StatusCodes.NO_CONTENT;
-    ctx.body = null;
-  })
   .patch("/user/:name", koaBody(), async (ctx) => {
     const { age, name } = ctx.request.body;
 
@@ -137,6 +124,41 @@ router
     await userRepository.save(user);
 
     ctx.body = user;
+  })
+  .delete("/user/:name", async (ctx) => {
+    const userRepository = dataSource.getRepository(User);
+    const user = await userRepository.findOneBy({ name: ctx.params.name });
+
+    if (!user) {
+      ctx.throw(StatusCodes.NOT_FOUND, "Usuário não encontrado.");
+    }
+
+    await userRepository.remove(user);
+
+    ctx.status = StatusCodes.NO_CONTENT;
+    ctx.body = null;
+  })
+  .delete("/users/all", async (ctx) => {
+    const queryRunner = await dataSource.createQueryRunner();
+
+    await queryRunner.startTransaction();
+
+    try {
+      await queryRunner.manager
+        .createQueryBuilder()
+        .delete()
+        .from(User)
+        .execute();
+
+      await queryRunner.commitTransaction();
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+    } finally {
+      await queryRunner.release();
+    }
+
+    ctx.status = StatusCodes.NO_CONTENT;
+    ctx.body = null;
   });
 
 module.exports = router;
