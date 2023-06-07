@@ -5,7 +5,7 @@ const User = require("../entities/user");
 
 const options = {
   type: "sqlite",
-  database: env.isTest ? ":memory:" : "database.sqlite",
+  database: env.isTest ? "dbtest.sqlite" : "database.sqlite",
   synchronize: true,
   entities: [User],
 };

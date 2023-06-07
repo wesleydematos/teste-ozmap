@@ -1,5 +1,8 @@
+require("dotenv/config");
 const process = require("node:process");
 const envalid = require("envalid");
+
+const secretKey = process.env.SECRET_KEY;
 
 const environment = envalid.cleanEnv(process.env, {
   NODE_ENV: envalid.str({
@@ -10,7 +13,7 @@ const environment = envalid.cleanEnv(process.env, {
   SECRET: envalid.str({
     example: "must-be-a-very-long-string-at-least-32-chars",
     desc: "The secret to sign the JSON Web Tokens",
-    default: "frisbee-triumph-entail-janitor-impale",
+    default: secretKey,
   }),
 });
 

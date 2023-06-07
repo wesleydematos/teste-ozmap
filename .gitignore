@@ -49,4 +49,7 @@ Thumbs.db
 *.wmv
 
 # Local Database
-database.sqlite
+*.sqlite
+
+#Variáveis de ambiente
+.env
