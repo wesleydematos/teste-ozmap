@@ -23,6 +23,7 @@ Visão geral do projeto, um pouco das tecnologias usadas.
 - [sqlite3](https://www.sqlite.org/index.html)
 - [TypeORM](https://typeorm.io/)
 - [Dotenv](https://www.npmjs.com/package/dotenv)
+- [Cross-env](https://www.npmjs.com/package/cross-env)
 - [Envalid](https://www.npmjs.com/package/envalid)
 - [HTTP Graceful Shutdown](https://www.npmjs.com/package/http-graceful-shutdown)
 - [Koa2-Swagger UI](https://www.npmjs.com/package/koa2-swagger-ui)
@@ -58,7 +59,7 @@ npm install
 
 ### 3.2. Variáveis de Ambiente
 
-No momento não é necessário o preenchimento de variáveis de ambiente, mas caso se torne necessário crie um arquivo **.env**, copiando o formato do arquivo **.env.example** e sempre que for adicionada uma chave necessária no '.env' adicione-a no '.env.example'
+Crie um arquivo **.env** na raíz do projeto, copie e preencha os valores para as chaves presentes do arquivo **.env.example** dentro do arquivo **.env**.
 
 ### 3.3. Scripts
 
@@ -78,7 +79,9 @@ npm test
 
 ### 3.4. Banco de dados
 
-O banco de dados será iniciado em um arquivo chamado database.sqlite após utilização dos scripts, o mesmo será utilizado tanto no ambiente de desenvolvimento quanto de testes, portanto, para que não haja erro nos testes é necessário que o banco esteja sem dados inseridos. Caso rode os testes uma vez e queira rodar novamente é necessário a exclusão do arquivo 'database.sqlite' ou exclusão dos dados através do ambiente de desenvolvimento.
+O banco de dados será iniciado em um arquivo chamado database.sqlite após utilização de qualquer um do script para ambiente de desenvolvimento, já no ambiente de testes, o banco de dados utilizado será o dbtest.sqlite, que será criado automáticamente após a execução do script.
+
+IMPORTANTE: Após a primeira execução dos testes um teste apresentará erro pois a conexão com o banco é perdida e logo após é reestabelecida para o teste seguinte, porém, ao executar o script outras vezes (com o arquivo dbtest.sqlite na raíz do projeto) o erro deixa de existir e todos os testes ficam funcionais. Devido esse erro de conexão não foi possível guardar os dados apenas em memória e para isso o arquivo dbtest.sqlite é criado automáticamente após a primeira execução e sempre é zerado ao fim dos testes.
 
 ---
 
@@ -105,6 +108,7 @@ O banco de dados será iniciado em um arquivo chamado database.sqlite após util
 | GET    | /user/:name               | Lista um usuário usando seu nome como parâmetro                            |
 | PATCH  | /user/:name               | Editar as informações do usuário usando seu nome como parâmetro            |
 | DELETE | /user/:name               | Deletar usuário usando seu nome como parâmetro                             |
+| DELETE | /users/all                | Deletar todos os usuários da aplicação                                     |
 | GET    | /swagger                  | Documentação da API com Swagger-UI                                         |
 
 ---
@@ -211,12 +215,12 @@ Vazio
 
 ### 1.3. **Listar Usuário por nome**
 
-### `GET/users/:name`
+### `GET/user/:name`
 
 ### Exemplo de Request:
 
 ```
-GET/users/Wesley
+GET/user/Wesley
 Host: http://localhost:3000
 Content-type: None
 ```
@@ -258,12 +262,12 @@ Vazio
 
 ### 1.4. **Editar Usuário por nome**
 
-### `PATCH/users/:name`
+### `PATCH/user/:name`
 
 ### Exemplo de Request:
 
 ```
-PATCH/users/Wesley
+PATCH/user/Wesley
 Host: http://localhost:3000
 Content-type: application/json
 ```
@@ -311,12 +315,12 @@ Todos os campos (name, email, age) podem ser editados e todos eles são opcionai
 
 ### 1.5. **Deletar Usuário por ID**
 
-### `DELETE/users/:name`
+### `DELETE/user/:name`
 
 ### Exemplo de Request:
 
 ```
-DELETE/users/Wesley
+DELETE/user/Wesley
 Host: http://localhost:3000
 Content-type: None
 ```
@@ -343,11 +347,35 @@ Vazio
 Vazio
 ```
 
-### Possíveis Erros:
+---
 
-| Código do Erro | Descrição       |
-| -------------- | --------------- |
-| 404 Not Found  | User not found. |
+### 1.6. **Deletar todos os usuários**
+
+### `DELETE/users/all`
+
+### Exemplo de Request:
+
+```
+DELETE/users/all
+Host: http://localhost:3000
+Content-type: None
+```
+
+### Corpo da Requisição:
+
+```json
+Vazio
+```
+
+### Exemplo de Response:
+
+```
+204 No content
+```
+
+```json
+Vazio
+```
 
 ---
 
