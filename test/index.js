@@ -240,4 +240,15 @@ describe("Testes da aplicaçao", () => {
         done();
       });
   });
+
+  it("deveria deletar todos usuários", function (done) {
+    chai
+      .request(app)
+      .delete("/users/all")
+      .end(function (err, res) {
+        expect(err).to.be.null;
+        expect(res).to.have.status(204);
+        done();
+      });
+  });
 });
