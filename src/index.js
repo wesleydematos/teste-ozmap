@@ -3,6 +3,7 @@ const gracefulShutdown = require("http-graceful-shutdown");
 const Koa = require("koa");
 const yamljs = require("yamljs");
 const { koaSwagger } = require("koa2-swagger-ui");
+const cors = require("@koa/cors");
 
 const env = require("./config/environment");
 const dataSource = require("./config/orm");
@@ -37,6 +38,7 @@ void (async (server) => {
   }
 })(server);
 
+app.use(cors());
 app.use(router.routes()).use(router.allowedMethods());
 app.use(
   koaSwagger({
