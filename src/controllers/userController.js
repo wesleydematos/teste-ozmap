@@ -51,7 +51,7 @@ router
   })
   .get("/users", async (ctx) => {
     const page = Number(ctx.request.query.page) || 1;
-    const pageSize = 5;
+    const pageSize = 10;
 
     const startIndex = (page - 1) * pageSize;
     const endIndex = page * pageSize;
