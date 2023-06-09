@@ -79,9 +79,9 @@ npm test
 
 ### 3.4. Banco de dados
 
-O banco de dados será iniciado em um arquivo chamado database.sqlite após utilização de qualquer um do script para ambiente de desenvolvimento, já no ambiente de testes, o banco de dados utilizado será o dbtest.sqlite, que será criado automáticamente após a execução do script.
+O banco de dados será iniciado em um arquivo chamado database.sqlite após utilização do script para ambiente de desenvolvimento, já no ambiente de testes, o banco de dados utilizado será o dbtest.sqlite, que será criado automaticamente após a execução do script de teste.
 
-IMPORTANTE: Após a primeira execução dos testes um teste apresentará erro pois a conexão com o banco é perdida e logo após é reestabelecida para o teste seguinte, porém, ao executar o script outras vezes (com o arquivo dbtest.sqlite na raíz do projeto) o erro deixa de existir e todos os testes ficam funcionais. Devido esse erro de conexão não foi possível guardar os dados apenas em memória e para isso o arquivo dbtest.sqlite é criado automáticamente após a primeira execução e sempre é zerado ao fim dos testes.
+IMPORTANTE: Após a primeira execução dos testes um deles poderá apresentar erro, pois, a conexão com o banco é perdida e logo após é reestabelecida para o teste seguinte, porém ao executar o script outras vezes (com o arquivo dbtest.sqlite já na raíz do projeto) o erro deixa de existir e todos os testes ficam funcionais. Devido esse erro de conexão não foi possível guardar os dados apenas em memória e para isso o arquivo dbtest.sqlite é criado automaticamente após a primeira execução e sempre é zerado ao fim dos testes, funcionando como tal.
 
 ---
 
